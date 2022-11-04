@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script src='https://use.fontawesome.com/releases/v5.0.13/js/all.js'></script>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <!-- Emoji Data -->
+    <script src="../js/jquery.emojipicker.js"></script>
+    <script src="../js/jquery.emojis.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/jquery.emojipicker.css">
+    <link rel="stylesheet" type="text/css" href="../css/jquery.emojipicker.tw.css">
+
+    <link rel="stylesheet" href="../css/index.css" />
+    <title>채팅 프로그램</title>
+</head>
+
+<body>
+    <section class="container">
+        <header class="header">
+            <div class="msger-header-title">
+                <i class="fas fa-comment-alt"></i>
+                Simple Chatting Program
+            </div>
+
+            <div class="msger-header-options">
+                <span><i class="fas fa-cog"></i></span>
+            </div>
+        </header>
+
+
+        <main class="msg-chat">
+            <div class="header_area">
+                <div class="main_header_area animated">
+                    <div class="container-2">
+                        <nav id="navigation1" class="navigation">
+                            <div class="nav-header">
+                                <div class="nav-toggle"></div>
+                            </div>
+
+                            <!-- Main Menus Wrapper -->
+                            <div class="nav-menus-wrapper">
+                                <ul class="nav-menu align-to-right">
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">사진, 동영상</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">파일</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">링크</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">톡캘린더</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">뮤직</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="r_li">
+                                        <a class="disableLink" href="#">톡게시판</a>
+                                        <img class="right_img" src="../image/right-a.png ">
+                                    </li>
+
+                                    <li class="last_li">
+                                        <a class="disableLink" href="#">대화상대</a>
+                                        <div class="add_user">
+                                            <img class="add_img" src="../image/add2.png">
+                                            <p class="add_name">대화상대 초대</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div id="chat-list" class="chat-list"></div>
+
+            <div id="input-container">
+                <span class="box1">
+                    <select id="nick-list">
+                        <option value="전체">전체</option>
+                    </select>
+                </span>
+
+                <span class="box2">
+                    <input type="text" id="message" class="int emojiable-option" onkeyup="checkMsg();">
+                    <!-- <img src="../image/icon.png" id="emojis" class="pswdImg"> -->
+                </span>
+
+                <span class="box3">
+                    <button type="button" id="btnJoin" onclick="send();">전송</button>
+                </span>
+            </div>
+        </main>
+
+
+    </section>
+
+
+    <script>
+        let socket = io.connect();
+        let nickname = prompt('닉네임을 입력해주세요');
+
+        // 이모지 관련
+        $(document).ready(function (e) {
+            $('#message').emojiPicker();
+
+            $(".emojiable-option").on("keyup", function () {
+                //console.log("emoji added, input val() is: " + $(this).val());
+            });
+        })
+
+        // info2 이벤트에 키:값 형태로 데이터를 보낸다.
+        socket.emit('info2', { nickname: nickname });
+
+
+        // input text 값이 비어 있을 시 버튼 비활성화(button에 disable 작성해야한다.)
+        // function checkMsg(){
+        //     let msg = document.getElementById('message').value;
+        //     let btn = document.getElementById('btnJoin');
+
+        //     if(msg == ''){
+        //         btn.disabled = true;
+
+        //     } else{
+        //         btn.disabled = false;
+        //     }
+        // }
+
+
+
+        // 전송 버튼을 클릭 시 이벤트가 발생한다.
+
+        function send() {
+            let msg = document.getElementById('message').value;
+
+            if (msg == '') return;
+
+            let nick = document.getElementById('nick-list').value;
+            let btn = document.getElementById('btnJoin');
+
+            // send 이벤트에 키:값 형태로 데이터를 보낸다.
+            socket.emit('send', { msg: msg, to: nick });
+            document.getElementById('message').value = '';
+
+        }
+
+
+        socket.on('newMessage', function (data) {
+            let chat_list = document.getElementById('chat-list');
+            let my_chat = document.querySelector('.my-chat');
+            let div = document.createElement('div');
+            let div_chat = document.createElement('div');
+            let span = document.createElement('span');
+            let span_date = document.createElement('span');
+
+            let img = document.createElement('img');
+            img.src = './image/profile.gif';
+            img.width = 40;
+
+            let date = new Date();
+            // let month = date.getMonth() + 1;
+            // let day = date.getDate();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+
+            let ampm = hours >= 12 ? '오후' : '오전';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+
+            div_chat.textContent = data.msg;
+
+            if (data.is_dm) {
+                div_chat.textContent = '(DM) ' + div_chat.textContent;
+            }
+
+            // data.nickname => 메시지를 보내는 사람
+            // nickname => 접속한 사람
+            // 동일 하다면 내가 채팅 친다. 동일하지 않다면 타인이 채팅을 친다.
+            if (data.nickname == nickname) {
+                div.classList.add('my-chat');
+
+                /* time */
+                div.appendChild(span);
+                span.className = 'date_txt_1';
+                span.innerHTML = `${ampm} ${hours}:${minutes < 10 ? `0${minutes}`:minutes}`;
+                // span.innerHTML = `${hours < 13 ? `오전 ${(hours - 12) < 10 ? `0${(hours - 12)}`:(hours - 12)}`:`오후 ${(hours - 12) < 10 ? `0${(hours - 12)}`:(hours -12)}`}:${minutes < 10 ? `0{minutes}`:minutes}`;
+                // span.innerHTML = `${hours}:${minutes < 10 ? `0{minutes}`:minutes}`;
+
+
+            } else {
+                span.textContent = data.nickname;
+                div.appendChild(img);
+                div.appendChild(span);
+                span.className = 'user_name';
+                div.classList.add('other-chat');
+
+                div.appendChild(span_date);
+                span_date.className = 'date_txt_2';
+                span_date.innerHTML = `${ampm} ${hours}:${minutes < 10 ? `0${minutes}`:minutes}`;
+                // span_date.innerHTML = `${hours}:${minutes}`;
+            }
+
+            div.appendChild(div_chat);
+            chat_list.appendChild(div);
+
+
+            chat_list.scrollTop = chat_list.scrollHeight;
+        });
+
+
+
+        // ○○○ 님이 입장하셨습니다.
+        socket.on('welcome', function (data) {
+            let chat_list = document.getElementById('chat-list');
+            let div = document.createElement('div');
+            let p = document.createElement('p');
+
+            div.className = 'welcome_box';
+            p.textContent = data;
+            chat_list.appendChild(div);
+            div.appendChild(p);
+        });
+
+
+        function setSelect(name){
+            let nick_list = document.getElementById('nick-list');
+            let option = document.createElement('option');
+            option.text = name;
+            option.value = name;
+            nick_list.appendChild(option);
+        }
+
+        function setRight(name){
+            let user_li = document.querySelector('.last_li');
+            let div_li = document.createElement('div');
+
+            user_li.appendChild(div_li);
+            div_li.className = 'user_list';
+
+            let p2 = document.createElement('p');
+            let img2 = document.createElement('img');
+
+
+            img2.src = './image/profile.gif';
+            img2.width = 40;
+            img2.className = 'user_img';
+
+            p2.className = 'user_p';
+            p2.textContent = name;
+            div_li.appendChild(p2);
+            div_li.appendChild(img2);
+        }
+
+
+
+        socket.on('list', function (list) {
+            // list = {id ~~ : nickname, id ~~ : nickname};
+            let nick_list = document.getElementById('nick-list');
+
+            while (nick_list.firstChild) {
+                // select 안에 자식 요소를 지운다.
+                nick_list.removeChild(nick_list.lastChild);
+            }
+
+            let option = document.createElement('option');
+            option.text = '전체';
+            option.value = '전체';
+            nick_list.appendChild(option);
+
+
+            let user_list = document.querySelectorAll('.user_list');
+
+            for(let i = 0; i < user_list.length; i++){
+                user_list[i].remove();
+            }
+
+            setRight(nickname);
+
+            for (let [key, value] of Object.entries(list)) {
+                if(value == nickname) continue;
+                setRight(value);
+                setSelect(value);
+            }
+        });
+
+
+        // 텍스트 창에서 엔터 입력 시 글 작성 
+        let input = document.getElementById('message');
+
+        input.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("btnJoin").click();
+            }
+        });
+
+
+        // a링크 비활성화
+        document.querySelector(".disableLink").removeAttribute('href');
+    </script>
+
+    <!-- hamburger -->
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script> -->
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

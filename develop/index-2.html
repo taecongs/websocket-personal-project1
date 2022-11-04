@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script src='https://use.fontawesome.com/releases/v5.0.13/js/all.js'></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <!-- Emoji Data -->
+    <link rel="stylesheet" type="text/css" href="../css/jquery.emojipicker.css">
+    <link rel="stylesheet" type="text/css" href="../css/jquery.emojipicker.tw.css">
+    <script type="text/javascript" src="../js/jquery.emojipicker.js"></script>
+    <script type="text/javascript" src="../js/jquery.emojis.js"></script>
+
+    <link rel="stylesheet" href="../css/index.css" />
+    <title>채팅 프로그램</title>
+</head>
+
+<body>
+    <section class="container">
+        <header class="header">
+            <div class="msger-header-title">
+                <i class="fas fa-comment-alt"></i>
+                Simple Chatting Program
+            </div>
+
+            <div class="msger-header-options">
+                <span><i class="fas fa-cog"></i></span>
+            </div>
+        </header>
+
+
+        <main class="msg-chat">
+            <div id="chat-list" class="chat-list"></div>
+
+            <div id="input-container">
+                <span class="box1">
+                    <select id="nick-list">
+                        <option value="전체">전체</option>
+                    </select>
+                </span>
+
+                <span class="box2">
+                    <input type="text" id="message" class="int emojiable-option" onkeyup="checkMsg();">
+                    <!-- <img src="../image/icon.png" id="emojis" class="pswdImg"> -->
+                </span>
+
+                <span class="box3">
+                    <button type="button" id="btnJoin" onclick="send();">전송</button>
+                </span>
+            </div>
+        </main>
+
+
+    </section>
+
+
+    <script>
+        let socket = io.connect();
+        let nickname = prompt('닉네임을 입력해주세요');
+
+        // 이모지 관련
+        $(document).ready(function (e) {
+            $('#message').emojiPicker();
+
+            $(".emojiable-option").on("keyup", function () {
+                //console.log("emoji added, input val() is: " + $(this).val());
+            });
+        })
+
+        // info2 이벤트에 키:값 형태로 데이터를 보낸다.
+        socket.emit('info2', { nickname: nickname });
+
+
+        // input text 값이 비어 있을 시 버튼 비활성화(button에 disable 작성해야한다.)
+        // function checkMsg(){
+        //     let msg = document.getElementById('message').value;
+        //     let btn = document.getElementById('btnJoin');
+
+        //     if(msg == ''){
+        //         btn.disabled = true;
+
+        //     } else{
+        //         btn.disabled = false;
+        //     }
+        // }
+
+
+
+        // 전송 버튼을 클릭 시 이벤트가 발생한다.
+
+        function send() {
+            let msg = document.getElementById('message').value;
+
+            if (msg == '') return;
+
+            let nick = document.getElementById('nick-list').value;
+            let btn = document.getElementById('btnJoin');
+
+            // send 이벤트에 키:값 형태로 데이터를 보낸다.
+            socket.emit('send', { msg: msg, to: nick });
+            document.getElementById('message').value = '';
+
+        }
+
+
+        socket.on('newMessage', function (data) {
+            let chat_list = document.getElementById('chat-list');
+            let my_chat = document.querySelector('.my-chat');
+            let div = document.createElement('div');
+            let div_chat = document.createElement('div');
+            let span = document.createElement('span');
+            let span_date = document.createElement('span');
+
+            let img = document.createElement('img');
+            img.src = './image/profile.gif';
+            img.width = 40;
+
+            let date = new Date();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+
+            div_chat.textContent = data.msg;
+
+            if (data.is_dm) {
+                div_chat.textContent = '(DM) ' + div_chat.textContent;
+            }
+
+            // data.nickname => 메시지를 보내는 사람
+            // nickname => 접속한 사람
+            // 동일 하다면 내가 채팅 친다. 동일하지 않다면 타인이 채팅을 친다.
+            if (data.nickname == nickname) {
+                div.classList.add('my-chat');
+
+                /* time */
+                div.appendChild(span);
+                span.className = 'date_txt_1';
+                span.innerHTML = `${hours}:${minutes}`;
+
+
+            } else {
+                span.textContent = data.nickname;
+                div.appendChild(img);
+                div.appendChild(span);
+                span.className = 'user_name';
+                div.classList.add('other-chat');
+
+                div.appendChild(span_date);
+                span_date.className = 'date_txt_2';
+                span_date.innerHTML = `${hours}:${minutes}`;
+            }
+
+            div.appendChild(div_chat);
+            chat_list.appendChild(div);
+
+            chat_list.scrollTop = chat_list.scrollHeight;
+        });
+
+
+
+        // ○○○ 님이 입장하셨습니다.
+        socket.on('welcome', function (data) {
+            let chat_list = document.getElementById('chat-list');
+            let div = document.createElement('div');
+            let p = document.createElement('p');
+
+            div.className = 'welcome_box';
+            p.textContent = data;
+            chat_list.appendChild(div);
+            div.appendChild(p);
+        });
+
+
+
+        socket.on('list', function (list) {
+            // list = {id ~~ : nickname, id ~~ : nickname};
+            let nick_list = document.getElementById('nick-list');
+
+            while (nick_list.firstChild) {
+                // select 안에 자식 요소를 지운다.
+                nick_list.removeChild(nick_list.lastChild);
+            }
+
+            let option = document.createElement('option');
+            option.text = '전체';
+            option.value = '전체';
+            nick_list.appendChild(option);
+
+
+
+            // 예시 
+            let a = {
+                key1: '1',
+                key2: '2',
+                key3: '3'
+            };
+
+            // 리스트를 분해 시키면서 for문을 돈다.
+            for (let [key, value] of Object.entries(a)) {
+                // key = 'key1', value = '1';
+                // key = 'key2', value = '2';
+            }
+
+
+            for (let [key, value] of Object.entries(list)) {
+                let option = document.createElement('option');
+                option.text = value;
+                option.value = value;
+                nick_list.appendChild(option);
+            }
+        });
+
+
+        // 텍스트 창에서 엔터 입력 시 글 작성 
+        let input = document.getElementById('message');
+
+        input.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("btnJoin").click();
+            }
+        });
+    </script>
+</body>
+
+</html>

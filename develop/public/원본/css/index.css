@@ -1,0 +1,314 @@
+    @font-face {
+        font-family: 'S-CoreDream-3Light';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    :root {
+        --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --msger-bg: #fff;
+        --border: 2px solid #ddd;
+        --left-msg-bg: #ececec;
+        --right-msg-bg: #579ffb;
+    }
+
+
+    body {
+        display: flex;
+        height: 98vh;
+        align-items: center;
+        justify-content: center;
+        font-family: 'S-CoreDream-3Light';
+        /* background-image: var(--body-bg); */
+    }
+
+    .container {
+        display: flex;
+        flex-flow: column wrap;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 800px;
+        margin: 25px 10px;
+        /* height: calc(100% - 50px); */
+        border: var(--border);
+        /* border-radius: 5px; */
+        background: #b2c7da;
+        box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+    }
+
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: var(--border);
+        background: #fff;
+        color: #666;
+    }
+
+    .chat-list {
+        /* background: #fff; */
+        /* width: 100%; */
+        height: 1100px;
+        max-height: 1100px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: max-height 0.4s ease-in-out !important;
+        padding: 0 5%;
+        /* margin-bottom: 1%; */
+        /* border-radius: 5px; */
+    }
+
+    .chat-list::-webkit-scrollbar {
+        width: 20px;
+    }
+
+    .chat-list::-webkit-scrollbar-thumb {
+        background-color: #9cafbe;
+        background-clip: padding-box;
+        border: 2px solid transparent;
+    }
+
+
+    /* 시간 */
+    span.date_txt_1 {
+        position: relative;
+        left: -5px;
+        top: 5px;
+        font-size: 12px;
+    }
+
+    span.date_txt_2 {
+        /* position: absolute;
+        left:400px;
+        top:90px; */
+        font-size: 12px;
+        order: 3;
+        align-self: flex-end;
+        position: relative;
+        left: 4px;
+    }
+
+
+    /* ○○○ 입장하셨습니다. */
+    .welcome_box {
+        width: 50%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+
+    p {
+        text-align: center;
+        margin: 20px 0 20px 0;
+        font-size: 12px;
+        background: #9cafbe;
+        padding: 10px;
+        width: auto;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+
+    /* 나의 채팅 */
+    .my-chat {
+        text-align: right;
+    }
+
+    .my-chat div {
+        background: #f2dc07;
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 5px 10px;
+        position: relative;
+        max-width: 300px;
+        white-space: normal;
+        word-break: break-all;
+    }
+
+
+    .my-chat div::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: 10px;
+        left: auto;
+        right: -12px;
+        bottom: auto;
+        border: 6px solid;
+        border-color: #f2dc07 transparent transparent #f2dc07
+    }
+
+
+    /* 타인 채팅 */
+    .other-chat {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+        align-items: baseline;
+    }
+
+    .other-chat img {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        margin-right: 15px;
+    }
+
+    .other-chat div {
+        background: #fff;
+        display: inline-block;
+        /* margin-bottom: 20px; */
+        padding: 5px 10px;
+        position: relative;
+        margin-top: 40px;
+        max-width: 300px;
+        white-space: normal;
+        word-break: break-all;
+        /* margin-left:-11px; */
+    }
+
+    .other-chat .user_name {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 12px;
+        position: absolute;
+        left: 65px;
+        top: 18px;
+        order: 1;
+
+    }
+
+    .other-chat div::before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: 10px;
+        left: -12px;
+        right: auto;
+        bottom: auto;
+        border: 6px solid;
+        border-color: #fff transparent transparent #fff;
+        transform: scaleX(-1);
+    }
+
+
+
+    #input-container {
+        background: #fff;
+        display: flex;
+        align-items: center;
+    }
+
+    .send-btn {
+        width: 100%;
+        padding: 21px 0 17px;
+        border: 0;
+        cursor: pointer;
+        color: #fff;
+        background-color: #f2dc07;
+        font-size: 20px;
+        font-weight: 400;
+    }
+
+    .box1 {
+        display: inline-block;
+        width: 20%;
+        height: 51px;
+        /* border: 1px solid #dadada; */
+        padding: 10px 14px 10px 14px;
+        box-sizing: border-box;
+        background: #fff;
+        position: relative;
+    }
+
+    .box2 {
+        display: inline-block;
+        width: 70%;
+        height: 51px;
+        /* border: 1px solid #dadada; */
+        border-left: 2px solid #dadada;
+        padding: 10px 14px 10px 14px;
+        box-sizing: border-box;
+        background: #fff;
+        position: relative;
+    }
+
+    .box3 {
+        display: inline-block;
+        width: 90px;
+        height: 51px;
+        /* border: 1px solid #dadada; */
+        box-sizing: border-box;
+        background: #fff;
+        position: relative;
+    }
+
+    .int {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 29px;
+        border: none;
+        background: #fff;
+        font-size: 15px;
+    }
+
+    select {
+        width: 100%;
+        height: 29px;
+        font-size: 16px;
+        background: #fff url(../image/sel_arr_2x.gif) 100% 51% no-repeat;
+        background-size: 20px 8px;
+        -webkit-appearance: none;
+        display: inline-block;
+        text-align: start;
+        border: none;
+        cursor: default;
+        font-family: 'S-CoreDream-3Light';
+    }
+
+    option {
+        padding: 2%;
+    }
+
+    input#message {
+        font-family: 'S-CoreDream-3Light';
+        font-size: 16px;
+    }
+
+    input#message,
+    select#nick-list {
+        outline: none;
+    }
+
+    #btnJoin {
+        width: 90px;
+        height: 51px;
+        border: 0;
+        cursor: pointer;
+        color: #fff;
+        background-color: #381b1d;
+        font-size: 16px;
+        font-weight: 400;
+        font-family: 'S-CoreDream-3Light';
+    }
+
+    /* 텍스트 아이콘 */
+    .pswdImg {
+        width: 25px;
+        height: 25px;
+        display: inline-block;
+        position: absolute;
+        top: 48%;
+        right: 16px;
+        margin-top: -10px;
+        cursor: pointer;
+
+
+    }
