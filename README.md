@@ -18,6 +18,9 @@
  ┃ ┃ ┣ 📜jquery.emojipicker.js
  ┃ ┃ ┣ 📜jquery.emojis.js
  ┃ ┃ ┗ 📜script.js
+ ┣ 📂src
+ ┃ ┣ 📜index.html
+ ┃ ┗ 📜index.js
  ┣ 📜package-lock.json
  ┗ 📜package.json
 ```
